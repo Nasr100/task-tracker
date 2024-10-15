@@ -14,22 +14,88 @@ import com.google.gson.reflect.TypeToken;
 
 
 public class TaskTracker {
-	private static ArrayList<Task> tasks = new ArrayList<Task>(); ;  
+	private static ArrayList<Task> tasks = new ArrayList<Task>();
+	private static String[] arguments; 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		File tasksFile = createFile(); 
-//		Task t1 = new Task("Buy groceries");
-//		addTask(tasksFile,t1);
+		Scanner scanner = new Scanner(System.in);
+		String s;
 		
-//		Task t2 = new Task("yyy");
-//		addTask(tasksFile,t2);
-		updateTask(tasksFile,1,"coding");
-//		listallTasks(tasksFile);
+			 s =  (String)scanner.nextLine();
+			 while( !s.equals("exit")) {
+				 s = scanner.nextLine();
+				 arguments = s.split(" ");
+				 switch(arguments.length) {
+				 	case 1	:	switch(arguments[0]) 
+				 			{
+				 					case "list"	:	listallTasks(tasksFile);
+				 									break;
+				 					default		: 	System.out.println("instruction introuvable");
+				 									System.out.println("tap help for instructions use");
+				 			}
+				 					break;
+				 	case 2	:	switch(arguments[0]) 
+				 			{
+					 				case "add" 		:	if(arguments[1] instanceof String) 
+					 									{
+						 									Task t = new Task(arguments[1]);
+						 									addTask(tasksFile,t);
+					 									}else {
+						 									System.out.println("argument need to be string");
+						 									System.out.println("tap help for instructions use");
+					 									}
+					 									break;
+					 									
+					 				case "delete"	:	
+					 								try {
+					 									int x = Integer.parseInt(arguments[1]);
+				 										deleteTask(tasksFile,x); 
+					 								}catch(Exception e){
+					 									System.out.println("argument needs to be a number");
+					 									System.out.println("tap help for instructions use");
+					 								}
+		 												break;
+						 			case "list"	:	switch(arguments[1]) {
+								 					case "done"			: 	listDoneTasks(tasksFile);
+								 											break;
+						 							case "in-progress"	:	listInProgTasks(tasksFile);	
+						 													break;
+						 						}
+						 								break;
+				 			}
+				 					break;
+				 	case 3	:		
+				 					break;
+				 					
+				 	default : 	System.out.println("too much arguments");
+								System.out.println("tap help for instructions use");
+				 }
+			}
+			 scanner.close();
 		
+			
+
 	}
 	
 	
+	static public void help() {
+		System.out.println("--------------------------------------------");
+		
+		System.out.println("list all tasks			: list");
+		System.out.println("list in-progress tasks 	: list in-progress");
+		System.out.println("list finished tasks		: list done");
+		System.out.println("list unfinished tasks	: list todo");
+		System.out.println("list in-progress tasks	: list in-progress");
+		System.out.println("mark task finished		: mark-done id");
+		System.out.println("mark task in-progress	: mark-in-progress id");
+		System.out.println("list in-progress tasks 	: list in-progress");
+		System.out.println("add task 				: add \"task\"");
+		System.out.println("update task 			: update id \"task\"");
+		System.out.println("delete task				: delete id  ");
+		
+		System.out.println("--------------------------------------------");
 	
+	}
 	static public File createFile() {
 		File f = new File("Tasks.json");
 		try {
@@ -79,15 +145,9 @@ public class TaskTracker {
 			tasks = gson.fromJson(data,listType);
 			t.setid((tasks.getLast().id) + 1);
 			tasks.add(t);
-			try {
-				myWriter = new FileWriter(f);
-				gson.toJson(tasks,myWriter);
-				myWriter.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-						
+			WriteFile(f,tasks);	
 		}
+		System.out.println("Task added Successfully (ID : "+t.getId()+")");
 
 	}
 	
@@ -103,6 +163,7 @@ public class TaskTracker {
 		}
 		
 	}
+	
 	static public ArrayList<Task> tasksList(File f) {
 		String data = "";
 		Gson gson = new Gson();
@@ -141,7 +202,6 @@ public class TaskTracker {
 		DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"); //format it
 		String now = dateTime.format(myFormatObj); //assign it to the attribute
 		
-		
 		for(Task T: tasks) {
 			if(T.id == id) {
 				T.setDescription(newTask); 
@@ -149,9 +209,74 @@ public class TaskTracker {
 			}
 		}
 	
-		WriteFile(f,tasks);
+		WriteFile(f,tasks);	
+	}
 	
+	
+	static public void mark(String status,File f,int id) {
+		tasks = tasksList(f);
+		for(Task T: tasks) {
+			if(T.id == id) {
+				T.setStatus(status);
+			}
+		}
+		WriteFile(f,tasks);	
+	}
+	
+	static public void listDoneTasks(File f) {
+		tasks = tasksList(f);
+		for(Task T: tasks) {
+			if(T.getStatus() == "done") {
+				System.out.println("id: "+T.id);
+				System.out.println("description: "+T.description);
+				System.out.println("status: "+T.status);
+				System.out.println("createdAt: "+T.createdAt);
+				System.out.println("updatedAt: "+T.updatedAt);
+				System.out.println("==============================================");
+			}
+				
+		}
 		
-		
+	}
+	
+	static public void listTodoTasks(File f) {
+		tasks = tasksList(f);
+		for(Task T: tasks) {
+			if(T.getStatus() == "todo") {
+				System.out.println("id: "+T.id);
+				System.out.println("description: "+T.description);
+				System.out.println("status: "+T.status);
+				System.out.println("createdAt: "+T.createdAt);
+				System.out.println("updatedAt: "+T.updatedAt);
+				System.out.println("==============================================");
+			}
+				
+		}
+	}
+	
+	static public void listInProgTasks(File f) {
+		tasks = tasksList(f);
+		for(Task T: tasks) {
+			if(T.getStatus() == "in-progress") {
+				System.out.println("id: "+T.id);
+				System.out.println("description: "+T.description);
+				System.out.println("status: "+T.status);
+				System.out.println("createdAt: "+T.createdAt);
+				System.out.println("updatedAt: "+T.updatedAt);
+				System.out.println("==============================================");
+			}
+				
+		}
+	}
+	
+	static public void deleteTask(File f,int id) {
+		tasks = tasksList(f);
+		for(Task T: tasks) {
+			if(T.id == id) {
+				tasks.remove(T);
+			}
+		}
+		WriteFile(f,tasks);	
+	
 	}
 }
