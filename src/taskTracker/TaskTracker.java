@@ -21,59 +21,101 @@ public class TaskTracker {
 		Scanner scanner = new Scanner(System.in);
 		String s;
 		
-			 s =  (String)scanner.nextLine();
-			 while( !s.equals("exit")) {
-				 s = scanner.nextLine();
-				 arguments = s.split(" ");
-				 switch(arguments.length) {
-				 	case 1	:	switch(arguments[0]) 
-				 			{
-				 					case "list"	:	listallTasks(tasksFile);
-				 									break;
-				 					default		: 	System.out.println("instruction introuvable");
-				 									System.out.println("tap help for instructions use");
-				 			}
-				 					break;
-				 	case 2	:	switch(arguments[0]) 
-				 			{
-					 				case "add" 		:	if(arguments[1] instanceof String) 
-					 									{
-						 									Task t = new Task(arguments[1]);
-						 									addTask(tasksFile,t);
-					 									}else {
-						 									System.out.println("argument need to be string");
-						 									System.out.println("tap help for instructions use");
-					 									}
+			s =  (String)scanner.nextLine();
+			 while( !s.equals("exit")) 
+			 {
+				 if(s.equals("help")) {
+					 help();
+				 }else {
+					 arguments = s.split(" ");
+					 
+					 switch(arguments.length) {
+					 	case 1	:switch(arguments[0]) 
+					 			{
+					 					case "list"	:	listallTasks(tasksFile);
 					 									break;
-					 									
-					 				case "delete"	:	
-					 								try {
-					 									int x = Integer.parseInt(arguments[1]);
-				 										deleteTask(tasksFile,x); 
-					 								}catch(Exception e){
-					 									System.out.println("argument needs to be a number");
+					 					default		: 	System.out.println("instruction introuvable");
 					 									System.out.println("tap help for instructions use");
-					 								}
-		 												break;
-						 			case "list"	:	switch(arguments[1]) {
-								 					case "done"			: 	listDoneTasks(tasksFile);
-								 											break;
-						 							case "in-progress"	:	listInProgTasks(tasksFile);	
-						 													break;
-						 						}
-						 								break;
-				 			}
-				 					break;
-				 	case 3	:		
-				 					break;
-				 					
-				 	default : 	System.out.println("too much arguments");
-								System.out.println("tap help for instructions use");
-				 }
+					 			}
+					 			break;
+					 			
+					 	case 2	:switch(arguments[0]) 
+					 			{
+						 				case "add" 		:	if(arguments[1] instanceof String) 
+						 									{
+							 									Task t = new Task(arguments[1]);
+							 									addTask(tasksFile,t);
+						 									}else {
+							 									System.out.println("argument need to be string");
+							 									System.out.println("tap help for instructions use");
+						 									}
+						 									break;
+						 									
+						 				case "delete"	:	
+						 								try{
+						 									int x = Integer.parseInt(arguments[1]);
+					 										deleteTask(tasksFile,x); 
+						 								}catch(Exception e){
+						 									System.out.println("argument needs to be a number");
+						 									System.out.println("tap help for instructions use");
+						 								}
+			 											break;
+			 											
+							 			case "list"		:switch(arguments[1]) 
+							 							{
+									 						case "done"			: 	listTasks(tasksFile,arguments[1]);
+									 												break;
+							 								case "in-progress"	:	listTasks(tasksFile,arguments[1]);
+							 														break;
+							 								case "todo"			:	listTasks(tasksFile,arguments[1]);		
+							 														break;
+							 								default				:	System.out.println("argument error");
+							 														System.out.println("tap help for instructions use");					
+							 							}
+							 							break;
+							 							
+							 			case "mark-done":try
+							 							{
+							 								mark("done",tasksFile,Integer.parseInt(arguments[1]));
+							 							}catch(Exception e) {
+							 								System.out.println("argument need to be a number");
+	 														System.out.println("tap help for instructions use");
+							 							}
+							 							break;
+							 			case "mark-in-progress":try
+			 													{
+			 														mark("in-progress",tasksFile,Integer.parseInt(arguments[1]));
+			 													}catch(Exception e) {
+			 														System.out.println("argument need to be a number");
+			 														System.out.println("tap help for instructions use");
+			 													}
+							 									break;
+					 			}
+					 			break;
+					 			
+					 			
+					 	case 3	:int x=0;
+					 			try {
+			 						 x = Integer.parseInt(arguments[1]);
+					 			}catch(Exception e){
+					 				System.out.println("argument need to be a number");
+					 				System.out.println("tap help for instructions use");
+					 			}
+					 			if(arguments[2] instanceof String) {
+					 				updateTask(tasksFile,x,arguments[2]);
+					 			}else {
+					 				System.out.println("second argument need to be a string");
+					 				System.out.println("tap help for instructions use");
+					 			}
+					 			break;
+					 					
+					 	default : 	System.out.println("too much arguments");
+									System.out.println("tap help for instructions use");
+					 }
+				}
+				 s = (String)scanner.nextLine();
 			}
 			 scanner.close();
-		
-			
 
 	}
 	
@@ -223,51 +265,28 @@ public class TaskTracker {
 		WriteFile(f,tasks);	
 	}
 	
-	static public void listDoneTasks(File f) {
+	static public void listTasks(File f,String status) {
 		tasks = tasksList(f);
+		boolean c = true;
 		for(Task T: tasks) {
-			if(T.getStatus() == "done") {
+			System.out.println("status: "+T.status);
+			if(status.equals(T.getStatus())) {
 				System.out.println("id: "+T.id);
 				System.out.println("description: "+T.description);
 				System.out.println("status: "+T.status);
 				System.out.println("createdAt: "+T.createdAt);
 				System.out.println("updatedAt: "+T.updatedAt);
 				System.out.println("==============================================");
+				c=false;
 			}
 				
+		}
+		if(c) {
+			System.out.println(" Done Tasks Not found");
 		}
 		
 	}
 	
-	static public void listTodoTasks(File f) {
-		tasks = tasksList(f);
-		for(Task T: tasks) {
-			if(T.getStatus() == "todo") {
-				System.out.println("id: "+T.id);
-				System.out.println("description: "+T.description);
-				System.out.println("status: "+T.status);
-				System.out.println("createdAt: "+T.createdAt);
-				System.out.println("updatedAt: "+T.updatedAt);
-				System.out.println("==============================================");
-			}
-				
-		}
-	}
-	
-	static public void listInProgTasks(File f) {
-		tasks = tasksList(f);
-		for(Task T: tasks) {
-			if(T.getStatus() == "in-progress") {
-				System.out.println("id: "+T.id);
-				System.out.println("description: "+T.description);
-				System.out.println("status: "+T.status);
-				System.out.println("createdAt: "+T.createdAt);
-				System.out.println("updatedAt: "+T.updatedAt);
-				System.out.println("==============================================");
-			}
-				
-		}
-	}
 	
 	static public void deleteTask(File f,int id) {
 		tasks = tasksList(f);
