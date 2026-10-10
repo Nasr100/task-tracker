@@ -39,11 +39,11 @@ mvn clean package
 # Run
 java -jar target/<your-jar>.jar
 ````
-What I Learned
-Structuring a small Java application with clear separation of concerns
-
-Using Maven for build and dependency management
-
-Reading/writing JSON with a real library instead of manual file parsing
-
-Designing a simple CLI interaction loop
+# What I Learned
+  - Structuring a small Java application with clear separation of concerns
+  
+  - Using Maven for build and dependency management
+  
+  - Reading/writing JSON with a real library instead of manual file parsing
+  
+  - Designing a simple CLI interaction loop
