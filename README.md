@@ -24,3 +24,17 @@ src/
 └── ...
 Tasks.json # persisted task data
 pom.xml # Maven build file
+
+
+## How to Run
+
+```bash
+# Clone the repo
+git clone https://github.com/Nasr100/task-tracker.git
+cd task-tracker
+
+# Build
+mvn clean package
+
+# Run
+java -jar target/<your-jar>.jar
