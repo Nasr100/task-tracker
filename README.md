@@ -19,3 +19,8 @@ Supports CRUD operations, filtering, and persistent storage in JSON.
 - File I/O for persistence
 
 ## Project Structure
+src/
+├── main/java/... # application code
+└── ...
+Tasks.json # persisted task data
+pom.xml # Maven build file
